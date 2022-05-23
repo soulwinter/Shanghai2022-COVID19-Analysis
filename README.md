@@ -14,3 +14,4 @@ A big data analysis project for a large-scale outbreak in Shanghai in 2022.
 
 使用 Python 开发。如果有工具方法、类等，请使用 `.py` 新建文件，所有涉及画图的程序请使用 Notebook。
 
+312312
