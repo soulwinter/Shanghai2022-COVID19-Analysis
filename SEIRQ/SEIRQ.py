@@ -250,6 +250,6 @@ dataFrame[:timeLength].to_csv("result.csv")  # 保存 .csv 文件
 # 绘图，下图是一个简单样例，不是最终版本
 dayPlot = timeLength
 
-plt.plot(range(dayPlot), I[0:dayPlot], color="r")
-plt.plot(range(dayPlot), P[0:dayPlot], color="grey")
+plt.plot(range(dayPlot), Qh[0:dayPlot], color="r")
+plt.plot(range(dayPlot), Q[0:dayPlot], color="grey")
 plt.show()
