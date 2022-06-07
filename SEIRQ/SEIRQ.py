@@ -13,9 +13,9 @@ deathRate = 35/100000  # 死亡率
 vaccineProtectionRate = 0.3  # 疫苗防护率
 asymptomaticRate = 0.9  # 无症状比例
 infectedAgainRate = 0.01
-lengthOfIncubationPeriod = 10  # 潜伏期长度
+lengthOfIncubationPeriod = 10  # 潜伏期长度, FIXME: 下面改了
 lengthOfTreatment = 14  # 治疗时间
-asymptomaticToDiagnosedRate = 0.001  # 每天无症状向确诊转变的概率，注意和 asymptomaticRate 的关系
+asymptomaticToDiagnosedRate = 0.0005  # 每天无症状向确诊转变的概率，注意和 asymptomaticRate 的关系
 # 政策措施
 frequencyOfTesting = 3  # 核酸检测频率
 useLockdown = True  # 发现病例时是否封控
@@ -31,7 +31,7 @@ Rff = 0.7  # 防范区感染率
 testValidityRate = 0.73  # 核酸检测有效率
 lengthToHospital = 2  # 确诊患者从发病到去医院的时长
 
-firstInfected = 100  # 最开始的无症状感染者
+firstInfected = 5000  # 最开始的无症状感染者
 totalHealthyPeople = 100000
 
 # ----------------------------------------------------------------------------------------------------
@@ -66,6 +66,7 @@ for i in range(1, timeLength + 1):
     # 初始化数据
     testDate += 1
     totalInitReinfected = random.randint(0, floor(R[i-1] * infectedAgainRate * 2))
+    lengthOfIncubationPeriod = random.randint(3, 18)
 
     S[i] = S[i - 1]  # S 为所有可能感染的人群数量
     Sfk[i] = Sfk[i - 1]
@@ -139,14 +140,15 @@ for i in range(1, timeLength + 1):
     if floor(I[i] * asymptomaticToDiagnosedRate) > 0:
         P[i] += floor(I[i] * asymptomaticToDiagnosedRate)
         I[i] -= floor(I[i] * asymptomaticToDiagnosedRate)
-        pToHospital[i + lengthToHospital] += floor(I[i] * asymptomaticToDiagnosedRate)
+        pToHospital[i + (lengthToHospital if not inLockdown else random.randint(1, 2))] += floor(I[i] * asymptomaticToDiagnosedRate)
+        # 封控时间 患者会更快去医院，不受核酸结果有效率影响
 
     # 潜伏期转入确诊或无症状
     if toInfect[i] > 0:
         I[i] += floor(toInfect[i] * asymptomaticRate)
         P[i] += toInfect[i] - floor(toInfect[i] * asymptomaticRate)
         E[i] -= toInfect[i]
-        pToHospital[i + lengthToHospital] += toInfect[i] - floor(toInfect[i] * asymptomaticRate)
+        pToHospital[i + (lengthToHospital if not inLockdown else random.randint(0, 2))] += toInfect[i] - floor(toInfect[i] * asymptomaticRate)
 
     print("------------------------------------------------------")
     print(i, "可感染人数:", S[i] + Sfk[i] + Sgk[i] + Sff[i], "确诊病例:", P[i], "无症状：", I[i], "潜伏期：", E[i], "医院人数：", Qh[i],
