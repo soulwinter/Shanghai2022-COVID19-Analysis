@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 timeLength = 365  # 观测时长
 # 病毒特性
 R0 = 10  # 直接感染率
-deathRate = 35/100000  # 死亡率
+deathRate = 35/100000
 vaccineProtectionRate = 0.3  # 疫苗防护率
 asymptomaticRate = 0.9  # 无症状比例
 infectedAgainRate = 0.01
@@ -17,22 +17,22 @@ lengthOfIncubationPeriod = 10  # 潜伏期长度, FIXME: 下面改了
 lengthOfTreatment = 14  # 治疗时间
 asymptomaticToDiagnosedRate = 0.0005  # 每天无症状向确诊转变的概率，注意和 asymptomaticRate 的关系
 # 政策措施
-frequencyOfTesting = 3  # 核酸检测频率
-useLockdown = True  # 发现病例时是否封控
-fkProportion = 0.4  # 封控区占比
-gkProportion = 0.4
-ffProportion = 0.2  # 用上面两个减去，程序中没有用到
+frequencyOfTesting = 1  # 核酸检测频率
+useLockdown = False  # 发现病例时是否封控
+fkProportion = 1  # 封控区占比
+gkProportion = 0.0
+ffProportion = 0.0  # 用上面两个减去，程序中没有用到
 fkLeastTime = 7  # 连续多少天没病例就可以解除封控
 vaccineRate = 0.7  # 疫苗接种比率
 # 其他
 Rfk = 0.05  # 封控区感染率是普通感染率的比重（实际感染率 R0 * Rfk， 下同)
 Rgk = 0.5  # 管控区感染率
 Rff = 0.7  # 防范区感染率
-testValidityRate = 0.73  # 核酸检测有效率
-lengthToHospital = 2  # 确诊患者从发病到去医院的时长
+testValidityRate = 0.73  # 核酸检测有效率 FIXME: 0.73
+lengthToHospital = 3  # 确诊患者从发病到去医院的时长
 
-firstInfected = 5000  # 最开始的无症状感染者
-totalHealthyPeople = 100000
+firstInfected = 50  # 最开始的无症状感染者
+totalHealthyPeople = 25000000
 
 # ----------------------------------------------------------------------------------------------------
 
@@ -136,12 +136,13 @@ for i in range(1, timeLength + 1):
                 E[i] += tempReinfected
                 R[i] -= tempReinfected
 
-    # 无症状向确诊转变
-    if floor(I[i] * asymptomaticToDiagnosedRate) > 0:
-        P[i] += floor(I[i] * asymptomaticToDiagnosedRate)
-        I[i] -= floor(I[i] * asymptomaticToDiagnosedRate)
-        pToHospital[i + (lengthToHospital if not inLockdown else random.randint(1, 2))] += floor(I[i] * asymptomaticToDiagnosedRate)
-        # 封控时间 患者会更快去医院，不受核酸结果有效率影响
+    # # 无症状向确诊转变
+    # if floor(I[i] * asymptomaticToDiagnosedRate) > 0:
+    #     P[i] += floor(I[i] * asymptomaticToDiagnosedRate)
+    #     I[i] -= floor(I[i] * asymptomaticToDiagnosedRate)
+    #     pToHospital[i + (lengthToHospital if not inLockdown else random.randint(1, 2))] += floor(I[i] * asymptomaticToDiagnosedRate)
+    #     print("------------DEBUG:", floor(I[i] * asymptomaticToDiagnosedRate))
+    #     # 封控时间 患者会更快去医院，不受核酸结果有效率影响
 
     # 潜伏期转入确诊或无症状
     if toInfect[i] > 0:
@@ -248,8 +249,8 @@ dataFrame = DataFrame(data)
 dataFrame[:timeLength].to_csv("result.csv")  # 保存 .csv 文件
 
 # 绘图，下图是一个简单样例，不是最终版本
-dayPlot = timeLength
+dayPlot = 365
 
-plt.plot(range(dayPlot), Qh[0:dayPlot], color="r")
-plt.plot(range(dayPlot), Q[0:dayPlot], color="grey")
+plt.plot(range(dayPlot), D[0:dayPlot], color="r")
+# plt.plot(range(dayPlot), Q[0:dayPlot], color="b")
 plt.show()
