@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 # 当发现疫情时，我们以一个防范区的范围为 S；即只考虑该防范区内的范围
 
 # 以下是可以调整的参数
-timeLength = 365  # 观测时长
+timeLength = 50  # 观测时长
 # 病毒特性
 R0 = 10  # 直接感染率
 deathRate = 35/100000
@@ -15,10 +15,9 @@ asymptomaticRate = 0.9  # 无症状比例
 infectedAgainRate = 0.01
 lengthOfIncubationPeriod = 10  # 潜伏期长度, FIXME: 下面改了
 lengthOfTreatment = 14  # 治疗时间
-asymptomaticToDiagnosedRate = 0.0005  # 每天无症状向确诊转变的概率，注意和 asymptomaticRate 的关系
 # 政策措施
 frequencyOfTesting = 1  # 核酸检测频率
-useLockdown = False  # 发现病例时是否封控
+useLockdown = True  # 发现病例时是否封控
 fkProportion = 1  # 封控区占比
 gkProportion = 0.0
 ffProportion = 0.0  # 用上面两个减去，程序中没有用到
@@ -206,6 +205,7 @@ for i in range(1, timeLength + 1):
         if inLockdown and getPositive == 0:
             noCasesDays += 1
             if noCasesDays >= fkLeastTime:
+                print("封控解除！")
                 inLockdown = False
                 S[i] = Sgk[i] + Sfk[i] + Sff[i]
                 Sgk[i] = 0
@@ -249,8 +249,8 @@ dataFrame = DataFrame(data)
 dataFrame[:timeLength].to_csv("result.csv")  # 保存 .csv 文件
 
 # 绘图，下图是一个简单样例，不是最终版本
-dayPlot = 365
+dayPlot = timeLength
 
-plt.plot(range(dayPlot), D[0:dayPlot], color="r")
-# plt.plot(range(dayPlot), Q[0:dayPlot], color="b")
+plt.plot(range(dayPlot), Qh[0:dayPlot], color="r")
+plt.plot(range(dayPlot), Q[0:dayPlot], color="b")
 plt.show()
